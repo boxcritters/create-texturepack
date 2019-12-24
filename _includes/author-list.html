@@ -1,0 +1,1 @@
+{% for author in include.authors%}{% unless forloop.first %}{% if forloop.last %} and {% else %}, {% endif %}{% endunless %}<b><a href="/authors/{{author|slugify}}">{{author}}</a></b>{%endfor%}

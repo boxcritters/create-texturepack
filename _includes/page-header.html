@@ -1,0 +1,23 @@
+{% assign defaultimg = '/favicon.ico' %}
+
+<div class="page-header bg-light {%if page.video %}video{% endif%} {% if page.image != defaultimg or page.video %}media{% endif %}">
+    {% if page.video %}
+    {% if page.video or page.image != 'defaultimg %}<div class="overlay"></div>{%endif%}
+    <iframe width="800" height="400" class="page-header-media d-block w-100" src="{{page.video}}" frameborder="0"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    {% elsif page.image != defaultimg %}
+    <div class="overlay"></div>
+    <img src="{{ page.image }}" class="page-header-media img-fluid" alt="">
+
+    {% else %}
+    {% endif %}
+    <div class="container h-100">
+        <div class="d-flex h-100 text-center align-items-center">
+            {%- comment -%}{% if page.video or page.image %}text-white{%endif%}{%- endcomment -%}
+            <div class="w-100 {% if page.video or page.image != defaultimg %}text-white{%endif%}">
+                <h1 class="display-3">{{page.title}}</h1>
+                <p class="lead mb-0">{{page.description}}</p>
+            </div>
+        </div>
+    </div>
+</div>
