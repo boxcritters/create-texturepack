@@ -36,28 +36,11 @@ function getCurrentVersionInfo() {
     return getJSON('https://bc-mod-api.herokuapp.com/');
 }
 
-async function getFileURL(texture) {
-    var versionInfo = await getCurrentVersionInfo();
-    var sites = await getSites();
-
-    return getTextureURL(texture,sites,versionInfo)
-
-    /*if (!url.startsWith("http")) {
-        if(url.startsWith("/")) {
-            url = bc + url;
-        } else {
-            url = bcv + url;
-        }
-    }
-    return url;*/
-
+function getFormats() {
+	return getJSON('https://bc-mod-api.herokuapp.com/texture-data/');
 }
-
-async function getFormats() {
-	var formats = await getJSON('formats.json');
-    formats.texturePack.push(await getJSON('https://bc-mod-api.herokuapp.com/texture-data/'));
-    return formats;
-
+function getDefaultTP() {
+	return getJSON('https://bc-mod-api.herokuapp.com/textures/');
 }
 
 /**

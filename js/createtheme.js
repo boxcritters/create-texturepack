@@ -62,178 +62,130 @@ function createTPJSON() {
 }
 
 
+function CreateTextField(name,value="") {
+	var field = document.createElement("div");
+	field.classList.add("tp-attrib","card");
+	{
+		var head = document.createElement("div");
+		head.classList.add("card-header");
+		var span = document.createElement('span');
+		span.textContent = name;
+		head.appendChild(span);
+		field.appendChild(head);
+	}
+	{
+		var body = document.createElement('div');
+		body.className="card-body";
+		var input = document.createElement("input");
+		input.name = name;
+		input.value = value;
+		input.classList.add("form-control","px-2");
+		body.appendChild(input);
+		field.appendChild(body);
+	}
+	return field;
+}
 
-//Create Texture Psck Form
-document.addEventListener('DOMContentLoaded', () => {
+function CreateImgField(name,url) {
+	var field = document.createElement("div");
+	field.classList.add("tp-attrib","card");
+	{
+		var head = document.createElement("div");
+		head.classList.add("card-header");
+		var span = document.createElement('span');
+		span.textContent = name;
+		head.appendChild(span);
+		field.appendChild(head);
+	}
+	{
+		var image = new Image();
+		image.classList.add("card-img");
+		image.src = url;
+		field.appendChild(image);
+	}
+	{
+		var body = document.createElement('div');
+		body.className="card-body";
+		var input = document.createElement("input");
+		input.name = name;
+		input.classList.add("form-control","px-2");
+		body.appendChild(input);
+		field.appendChild(body);
+	}
+	return field;
+}
+
+
+async function CreateForm(list,session) {
+	var start = session==undefined;
+	session = session || {
+		keyID:0,
+		keys: Object.keys(await getDefaultTP()),
+		getTrueName:() => {return session.keys[session.keyID];}
+	}
+	var form = [];
+	if(session.keyID==0) {
+		var cat= new Category("Texture Pack Info",true);
+		for (session.keyID;session.keyID < 4; session.keyID++) {
+			cat.appendChild(CreateTextField(session.getTrueName()));
+		}
+		form.push(cat.getElement());
+	}
+	for(var name in list) {
+		var value = list[name]||"";
+		var trueName = session.getTrueName();
+		console.log(name,trueName,value);
+		if(typeof value == "object") {
+			var cat = new Category(name,false);
+			var subForm = await CreateForm(value,session);
+			subForm.forEach(item=>{cat.appendChild(item)});
+			form.push(start?cat.getElement():cat);
+			continue;
+		}
+		if(value.endsWith(".png")) {
+			form.push(CreateImgField(name,value));
+		}else {
+			form.push(CreateTextField(name))
+		}
+		session.keyID++;
+	}
+	return form;
+}
+
+
+//Create Texture Pack Form
+document.addEventListener('DOMContentLoaded', async () => {
 	var lastCategory = [""];
     /**
      * @type {Category[]}
      */
 	var currentCategoryGroups = [];
 	// @ts-ignore
-	getFormats().then(formats => {
-		var currentVersion = formats.texturePack.length - 1;
-		createtpform.appendChild(getVersionIndicator(currentVersion))
-		formats = formats.texturePack[currentVersion];
+	var formats = await getFormats();
 
-        /*
-       <div class="tp-attrib card">
-            <div class="card-header">
-                <span>Name</span>
+	var form = await CreateForm(formats)||[];
+	form.forEach(item=>{createtpform.appendChild(item);})
 
-            </div>
-            <img src="https://dummyimage.com/500" class="card-img" alt="">
-            <div class="card-body">
-                <input name="name" class="form-control px-2" required="">
-            </div>
-        </div>
-        */
-
-		formats.forEach((f, fid) => {
-			var formItem;
-			if (f.name || f.label) {
-				if (f.hidden) {
-					formItem = document.createElement("input");
-					formItem.name = f.name;
-					formItem.type = "hidden";
-
-				}
-				if (!f.hidden) {
-					formItem = document.createElement('div');
-					formItem.classList.add("tp-attrib", "card");
-
-					//HEADER
-					var header = document.createElement('div');
-					header.classList.add('card-header');
-					var formItemLabel = document.createElement('span');
-					formItemLabel.textContent = f.label || f.name;
-					header.appendChild(formItemLabel);
-
-					var img;
-					var defaultimg;
-					if (f.category !== "info") {
-						img = new Image();
-						formItem.append(img);
-						img.classList.add('card-img');
-						getFileURL(f).then((url) => {
-							img.setAttribute('src', url);
-							defaultimg = url;
-							img.onload = () => {
-                                /*console.log(img.width/img.height)
-                                var aspect = img.width/img.height;
-                                img.width = 160*aspect;
-                                img.height = 160;*/
-
-							};
-						});
-					}
-
-					var body = document.createElement('div');
-					body.classList.add('card-body');
-					var formItemValue;
-					if (f.name) {
-                        /**
-                         * @type {HTMLInputElement|HTMLParagraphElement}
-                         */
-						formItemValue = document.createElement('input');
-
-						var infocol = document.createElement('div');
-						infocol.classList.add("col-12");
-						formItemValue.name = f.name;
-						formItemValue.classList.add("form-control", "px-2");
-						if (img) {
-							$(formItemValue).on('change keyup paste', (e) => {
-								console.log(e);
-								console.log($(e.currentTarget).closest('.tp-attrib'));
-								let img = $(e.currentTarget).closest('.tp-attrib').find('img');
-
-								img.attr("src", e.currentTarget.value);
-								img.on("error", () => {
-									img.attr("src", defaultimg);
-								})
-							});
-						}
-						body.appendChild(formItemValue);
-					}
-
-					formItem.appendChild(header);
-					if (img) formItem.appendChild(img);
-					formItem.appendChild(body);
+	var button = document.createElement('button');
+	button.classList.add("btn", "btn-primary");
+	button.textContent = "Generate Texture Pack Code";
+	button.type = "submit";
+	createtpform.appendChild(button);
 
 
-					/***************************************** */
-                    /*
-                                        formItem = document.createElement('div');
-                                        var formItemLabel = document.createElement('span');
-                                        var formItemValue = document.createElement('input');
-                        
-                                        formItemLabel.textContent = f.label||f.name;
-                                        formItemValue.name = f.name;
-                                        formItemValue.classList.add("form-control","px-2");
-                                        if(f.required){
-                                            formItemValue.setAttribute("required","");
-                                        }
-                                        if(!f.default&&f.category!=="info") {
-                                            formItemValue.setAttribute("readonly","");
-                                            formItemValue.placeholder = "Coming Soon"
-                                        }
-                        
-                                        formItem.appendChild(formItemLabel);
-                                        formItem.appendChild(formItemValue);*/
+	var jsonbutton = document.createElement('a');
+	jsonbutton.classList.add("btn", "btn-secondary");
+	jsonbutton.textContent = "Download One Click File";
+	jsonbutton.href = "#";
+	createtpform.appendChild(jsonbutton);
+	jsonbutton.addEventListener("click", (e) => {
+		event.preventDefault();
+		createTPJSON();
+	})
 
+	createtpform.addEventListener('submit', (e) => {
+		event.preventDefault();
+		createTP();
+	});					
 
-
-
-				}
-			} else {
-				formItem = document.createElement('p');
-				formItem.classList.add("display-4");
-				formItem.textContent = "Coming Soon"
-			}
-
-			if (f.category) {
-				var category = f.category.split("/");
-				lastCategory.length = category.length;
-				currentCategoryGroups.length = category.length;
-				for (let i = 0; i < category.length; i++) {
-					if (lastCategory[i] !== category[i]) {
-
-						lastCategory[i] = category[i];
-						currentCategoryGroups[i] = new Category(category[i], fid == 0);
-						if (i == 0) {
-							createtpform.appendChild(currentCategoryGroups[i].getElement());
-						} else {
-							currentCategoryGroups[i - 1].appendChild(currentCategoryGroups[i]);
-						}
-                        /*var categoryHeading = document.createElement('h'+(i+1));
-                        categoryHeading.innerText = category[i];*/
-					}
-				}
-				currentCategoryGroups[currentCategoryGroups.length - 1].appendChild(formItem)
-			} else {
-				createtpform.appendChild(formItem);
-			}
-		});
-		var button = document.createElement('button');
-		button.classList.add("btn", "btn-primary");
-		button.textContent = "Generate Texture Pack Code";
-		button.type = "submit";
-		createtpform.appendChild(button);
-
-
-		var jsonbutton = document.createElement('a');
-		jsonbutton.classList.add("btn", "btn-secondary");
-		jsonbutton.textContent = "Download One Click File";
-		jsonbutton.href = "#";
-		createtpform.appendChild(jsonbutton);
-		jsonbutton.addEventListener("click", (e) => {
-			event.preventDefault();
-			createTPJSON();
-		})
-
-		createtpform.addEventListener('submit', (e) => {
-			event.preventDefault();
-			createTP();
-		});
-	});
 });

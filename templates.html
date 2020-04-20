@@ -1,0 +1,131 @@
+<div class="tp-attrib card">
+	<div class="card-header">
+		<span>KEY</span>
+	</div>
+	<img class="card-img" src="VALUE">
+	<div class="card-body">
+		<input name="KEY" class="form-control px-2" />
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-header" id="headingengine">
+		<h5 class="mb-0">
+			<button data-toggle="collapse" data-target="#collapseengine" aria-expanded="true"
+				aria-controls="collapseengine" class="btn btn-link">Engine</button>
+		</h5>
+	</div>
+	<div id="collapseengine" class="collapse show" aria-labelledby="headingengine" data-parent="#acordianStarShip">
+		<div class="card-body">
+			<div class="row">
+				<!--
+					...
+				-->
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+formats.forEach((f, fid) => {
+			var formItem;
+			if (f.name || f.label) {
+				if (f.hidden) {
+					formItem = document.createElement("input");
+					formItem.name = f.name;
+					formItem.type = "hidden";
+
+				}
+				if (!f.hidden) {
+					formItem = document.createElement('div');
+					formItem.classList.add("tp-attrib", "card");
+
+					//HEADER
+					var header = document.createElement('div');
+					header.classList.add('card-header');
+					var formItemLabel = document.createElement('span');
+					formItemLabel.textContent = f.label || f.name;
+					header.appendChild(formItemLabel);
+
+					var img;
+					var defaultimg;
+					if (f.category !== "info") {
+						img = new Image();
+						formItem.append(img);
+						img.classList.add('card-img');
+						getFileURL(f).then((url) => {
+							img.setAttribute('src', url);
+							defaultimg = url;
+							img.onload = () => {
+                                /*console.log(img.width/img.height)
+                                var aspect = img.width/img.height;
+                                img.width = 160*aspect;
+                                img.height = 160;*/
+
+							};
+						});
+					}
+
+					var body = document.createElement('div');
+					body.classList.add('card-body');
+					var formItemValue;
+					if (f.name) {
+                        /**
+                         * @type {HTMLInputElement|HTMLParagraphElement}
+                         */
+						formItemValue = document.createElement('input');
+
+						var infocol = document.createElement('div');
+						infocol.classList.add("col-12");
+						formItemValue.name = f.name;
+						formItemValue.classList.add("form-control", "px-2");
+						if (img) {
+							$(formItemValue).on('change keyup paste', (e) => {
+								console.log(e);
+								console.log($(e.currentTarget).closest('.tp-attrib'));
+								let img = $(e.currentTarget).closest('.tp-attrib').find('img');
+
+								img.attr("src", e.currentTarget.value);
+								img.on("error", () => {
+									img.attr("src", defaultimg);
+								})
+							});
+						}
+						body.appendChild(formItemValue);
+					}
+
+					formItem.appendChild(header);
+					if (img) formItem.appendChild(img);
+					formItem.appendChild(body);
+				}
+			} else {
+				formItem = document.createElement('p');
+				formItem.classList.add("display-4");
+				formItem.textContent = "Coming Soon"
+			}
+
+			if (f.category) {
+				var category = f.category.split("/");
+				lastCategory.length = category.length;
+				currentCategoryGroups.length = category.length;
+				for (let i = 0; i < category.length; i++) {
+					if (lastCategory[i] !== category[i]) {
+
+						lastCategory[i] = category[i];
+						currentCategoryGroups[i] = new Category(category[i], fid == 0);
+						if (i == 0) {
+							createtpform.appendChild(currentCategoryGroups[i].getElement());
+						} else {
+							currentCategoryGroups[i - 1].appendChild(currentCategoryGroups[i]);
+						}
+                        /*var categoryHeading = document.createElement('h'+(i+1));
+                        categoryHeading.innerText = category[i];*/
+					}
+				}
+				currentCategoryGroups[currentCategoryGroups.length - 1].appendChild(formItem)
+			} else {
+				createtpform.appendChild(formItem);
+			}
+		});
+</script>
