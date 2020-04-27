@@ -37,10 +37,10 @@ function getCurrentVersionInfo() {
 }
 
 function getFormats() {
-	return getJSON('https://bc-mod-api.herokuapp.com/texture-data/');
+	return getJSON('https://bc-mod-api.herokuapp.com/textures/');
 }
 function getDefaultTP() {
-	return getJSON('https://bc-mod-api.herokuapp.com/textures/');
+	return getJSON('https://bc-mod-api.herokuapp.com/textures/BoxCritters.bctp.json');
 }
 
 /**
