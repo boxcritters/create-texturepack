@@ -2,7 +2,7 @@ title: Box Critters Modding Community
 description: > # this means to ignore newlines until "baseurl:"
   My Github Website
 base-url: ""
-url: "https://boxcritters.github.io/create-texturepack" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://create.boxcrittersmods.ga" # the base hostname & protocol for your site, e.g. http://example.com
 repository: boxcritters/create-texturepack
 
 #favicon: favicon.gif
