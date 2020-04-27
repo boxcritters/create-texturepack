@@ -1,5 +1,6 @@
 //@ts-check
 var CONTENT_CONNECTED = false;
+var api = "https://api.boxcrittersmods.ga"
 
 function getURLParams() {
 	return window.location.search.replace('?','').split('&').reduce((obj,p)=>{
@@ -29,18 +30,18 @@ function getJSON(url) {
 }
 
 function getSites() {
-    return getJSON('https://bc-mod-api.herokuapp.com/sites');
+    return getJSON(api+'/sites');
 }
 
 function getCurrentVersionInfo() {
-    return getJSON('https://bc-mod-api.herokuapp.com/');
+    return getJSON(api);
 }
 
 function getFormats() {
-	return getJSON('https://bc-mod-api.herokuapp.com/textures/');
+	return getJSON(api+'/textures');
 }
 function getDefaultTP() {
-	return getJSON('https://bc-mod-api.herokuapp.com/textures/BoxCritters.bctp.json');
+	return getJSON(api+'/textures/BoxCritters.bctp.json');
 }
 
 /**
