@@ -1,6 +1,6 @@
 //@ts-check
 var CONTENT_CONNECTED = false;
-var api = "https://api.boxcrittersmods.ga"
+var api = "https://api.bcmc.ga"
 
 function getURLParams() {
 	return window.location.search.replace('?','').split('&').reduce((obj,p)=>{
